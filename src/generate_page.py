@@ -1,5 +1,6 @@
 from markdown_blocks import *
 import os
+from pathlib import Path
 
 
 def extract_title(markdown):
@@ -25,15 +26,22 @@ def generate_page(from_path, template_path, dest_path):
     template_content = template_content.replace(f"{{ Content }}", html_string)
     
     dest_dir_path = os.path.dirname(dest_path)
-    if dest_dir_path == "":
+    if dest_dir_path != "":
         os.makedirs(dest_dir_path, exist_ok=True)
     write_file = open(dest_path, "w")
     write_file.write(template_content)
-    write_file.close()
     
 def generate_page_recursively(dir_path_content, template_path, dest_dir_path):
     entries = os.listdir(dir_path_content)
-    for files in entries:
-        
+    for file in entries:
+        from_path = os.path.join(dir_path_content, file)
+        dest_path = os.path.join(dest_dir_path, file)
+        if os.path.isfile(from_path):
+            dest_path = Path(dest_path).with_suffix(".html")
+            generate_page(from_path, template_path, dest_path)
+        else:
+            generate_page_recursively(from_path, template_path, dest_path)
+            
+                
 
     
